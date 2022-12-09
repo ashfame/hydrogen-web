@@ -156,6 +156,34 @@ export class Client {
         });
     }
 
+    async startGuestLogin(homeserver) {
+        const currentStatus = this._status.get();
+        if (currentStatus !== LoadStatus.LoginFailed &&
+            currentStatus !== LoadStatus.NotLoading &&
+            currentStatus !== LoadStatus.Error) {
+            return;
+        }
+        this._resetStatus();
+
+        await this._platform.logger.run("login", async log => {
+            this._status.set(LoadStatus.Login);
+            try {
+                const request = this._platform.request;
+                const hsApi = new HomeServerApi({homeserver: homeserver, request: request});
+                const loginData = await hsApi.guestLogin().response();
+                await this.startWithAuthData({
+                    accessToken: loginData.access_token,
+                    deviceId: loginData.device_id,
+                    userId: loginData.user_id,
+                    homeserver: homeserver
+                });
+            } catch (err) {
+                this._error = err;
+                this._status.set(LoadStatus.Error);
+            }
+        });
+    }
+
     async startWithLogin(loginMethod, {inspectAccountSetup} = {}) {
         const currentStatus = this._status.get();
         if (currentStatus !== LoadStatus.LoginFailed &&

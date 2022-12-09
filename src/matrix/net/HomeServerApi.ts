@@ -179,6 +179,13 @@ export class HomeServerApi {
         return this._unauthedRequest( "POST", this._url("/register", CS_V3_PREFIX), undefined, body, options);
     }
 
+    guestLogin(initialDeviceDisplayName: string): IHomeServerRequest {
+        const body: any = {
+            initial_device_displayname: initialDeviceDisplayName ? initialDeviceDisplayName : 'Guest account on ' + this._homeserver,
+        }
+        return this._unauthedRequest("POST", this._url("/register", CS_V3_PREFIX), { kind: "guest" }, body );
+    }
+
     passwordLogin(username: string, password: string, initialDeviceDisplayName: string, options?: BaseRequestOptions): IHomeServerRequest {
         return this._unauthedRequest("POST", this._url("/login"), undefined, {
           "type": "m.login.password",

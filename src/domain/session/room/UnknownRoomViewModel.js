@@ -55,4 +55,8 @@ export class UnknownRoomViewModel extends ViewModel {
     get kind() {
         return "unknown";
     }
+
+    get peekable() {
+        return this._session.canPeekInRoom();
+    }
 }
